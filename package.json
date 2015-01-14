@@ -1,0 +1,15 @@
+{
+  "name": "resource-changed-events",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter spec --bail --check-leaks"
+  },
+  "author": "Daniel Sundman",
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "^2.1.0",
+    "should": "^4.6.0"
+  }
+}
