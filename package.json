@@ -10,6 +10,10 @@
   "license": "MIT",
   "devDependencies": {
     "mocha": "^2.1.0",
+    "nock": "^0.56.0",
     "should": "^4.6.0"
+  },
+  "dependencies": {
+    "request": "^2.51.0"
   }
 }

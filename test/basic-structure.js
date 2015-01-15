@@ -16,3 +16,11 @@ describe('Basic Structure', function() {
 		(new ResourceChangedEvents() instanceof EventEmitter).should.equal(true);
 	});
 });
+
+describe('API', function() {
+	it('ResourceChangedEvents.prototype.start should exist and be a function', function() {
+		console.log('ResourceChangedEvents', ResourceChangedEvents);
+		should.exist(ResourceChangedEvents.prototype.start);
+		(typeof ResourceChangedEvents.prototype.start).should.equal('function');
+	});
+});
