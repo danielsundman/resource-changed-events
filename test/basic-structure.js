@@ -22,4 +22,8 @@ describe('API', function() {
 		should.exist(ResourceChangedEvents.prototype.start);
 		(typeof ResourceChangedEvents.prototype.start).should.equal('function');
 	});
+	it('ResourceChangedEvents.prototype.stop should exist and be a function', function() {
+		should.exist(ResourceChangedEvents.prototype.stop);
+		(typeof ResourceChangedEvents.prototype.stop).should.equal('function');
+	});
 });

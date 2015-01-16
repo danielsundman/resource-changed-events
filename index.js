@@ -5,18 +5,32 @@ var request = require('request');
 exports = module.exports = ResourceChangedEvents;
 
 function ResourceChangedEvents(config) {
-	this.config = config;
+	config = config || {};
+	this.config = {};
+	this.config.url = config.url || 'http://www.example.com'; // TODO exception
+	this.config.interval = config.interval || 2000;
 }
 
 util.inherits(ResourceChangedEvents, EventEmitter);
 
 ResourceChangedEvents.prototype.start = function() {
 	var that = this;
-	request(this.config.url, function (error, response, body) {
-		if (!error && response.statusCode == 200) {
-			that.emit('data', body);
-		}
+	var url = this.config.url;
+	var interval = this.config.interval;
+	this.timeout = setInterval(function() {
+		request(url, function (err, response, body) {
+			if (!err && response.statusCode === 200) {
+				that.emit('data', body);
+			}
+		}, interval);
 	});
+};
+
+ResourceChangedEvents.prototype.stop = function() {
+	if (this.timeout) {
+		clearInterval(this.timeout);
+		this.timeout = undefined;
+	}
 };
 
 
