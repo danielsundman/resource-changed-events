@@ -4,11 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter spec --bail --check-leaks"
+    "test": "mocha --reporter spec --bail --check-leaks",
+    "coverage": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --ui bdd -R spec -t 5000"
   },
   "author": "Daniel Sundman",
   "license": "MIT",
   "devDependencies": {
+    "istanbul": "^0.3.5",
     "mocha": "^2.1.0",
     "nock": "^0.56.0",
     "should": "^4.6.0"
