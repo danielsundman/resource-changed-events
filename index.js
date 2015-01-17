@@ -11,7 +11,9 @@ function ResourceChangedEvents(config) {
 	this.config = {};
 	this.config.url = config.url || 'http://www.example.com'; // TODO exception
 	this.config.interval = config.interval || 2000;
-	this.conversion = config.conversion || './no-conversion';
+	this.conversion = config.conversion || function(data, cb) {
+		cb(null, data);
+	};
 	this.diff = config.diff || function() {
 		return true;
 	};
@@ -46,7 +48,8 @@ ResourceChangedEvents.prototype.start = function() {
 	};
 
 	var convert = function(data, cb) {
-		require(that.conversion)(data, cb);
+		var f = (typeof that.conversion === 'function') ? that.conversion : require(that.conversion);
+		f(data, cb);
 	};
 
 	var diff = function(dataOld, dataNew) {
