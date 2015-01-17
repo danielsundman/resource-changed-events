@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "debug": "^2.1.1",
-    "request": "^2.51.0"
+    "request": "^2.51.0",
+    "xml2js": "^0.4.4"
   }
 }

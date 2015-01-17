@@ -11,6 +11,8 @@ function ResourceChangedEvents(config) {
 	this.config = {};
 	this.config.url = config.url || 'http://www.example.com'; // TODO exception
 	this.config.interval = config.interval || 2000;
+	this.conversion = config.conversion || './no-conversion';
+
 	this.data = undefined;
 	this.lastModified = undefined;
 	this.running = false;
@@ -40,18 +42,24 @@ ResourceChangedEvents.prototype.start = function() {
 		return (response.statusCode === 200 || response.statusCode === 304) && that.running;
 	};
 
+	var convert = function(data, cb) {
+		require(that.conversion)(data, cb);
+	};
+
 	var run = function() {
 		var options = prepareRun();
 
 		debug('requesting ' + JSON.stringify(options) + ' interval ' + interval);
-		request(options, function(err, response, data) {
+		request(options, function(err, response, respData) {
 			if (err) return;
 			debug('status code ' + response.statusCode);
 			if (response.statusCode === 200) {
-				debugData('data:' + JSON.stringify(data));
-				that.emit('data', data);
-				that.data = data;
-				that.lastModified = response.headers['last-modified'];
+				convert(respData, function(err, data) {
+					debugData('data:' + JSON.stringify(data));
+					that.emit('data', data);
+					that.data = data;
+					that.lastModified = response.headers['last-modified'];
+				});
 			}
 			if (statusCodeOkAndStillRunning(response)) {
 				setTimeout(run, interval);
