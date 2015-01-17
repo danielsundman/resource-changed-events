@@ -28,7 +28,7 @@ describe('Happy Path', function() {
 		});
 
 		var verifyCallComplete = function(url, expected, done) {
-			var rce = new ResourceChangedEvents({url: url});
+			var rce = new ResourceChangedEvents({url: url, interval: 100});
 			rce.on('data', function(data) {
 				should.exist(data);
 				data.should.equal(expected);

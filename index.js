@@ -2,6 +2,7 @@ var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 var request = require('request');
 var debug = require('debug')('request');
+var debugData = require('debug')('request:data');
 
 exports = module.exports = ResourceChangedEvents;
 
@@ -10,30 +11,58 @@ function ResourceChangedEvents(config) {
 	this.config = {};
 	this.config.url = config.url || 'http://www.example.com'; // TODO exception
 	this.config.interval = config.interval || 2000;
+	this.data = undefined;
+	this.lastModified = undefined;
+	this.running = false;
 }
 
 util.inherits(ResourceChangedEvents, EventEmitter);
 
 ResourceChangedEvents.prototype.start = function() {
 	var that = this;
-	var url = this.config.url;
-	var interval = this.config.interval;
-	this.timeout = setInterval(function() {
-		debug('requesting ' + url);
-		request(url, function (err, response, body) {
-			if (!err && response.statusCode === 200) {
-				debug('response status ' + response.statusCode + ' data ' + body);
-				that.emit('data', body);
+	var interval = that.config.interval;
+
+	this.running = true;
+
+	var prepareRun = function() {
+		var options = {
+			url: that.config.url
+		};
+		if (that.lastModified) {
+			options.headers = {
+				'If-Modified-Since': that.lastModified
 			}
-		}, interval);
-	});
+		}
+		return options;
+	};
+
+	var statusCodeOkAndStillRunning = function(response) {
+		return (response.statusCode === 200 || response.statusCode === 304) && that.running;
+	};
+
+	var run = function() {
+		var options = prepareRun();
+
+		debug('requesting ' + JSON.stringify(options) + ' interval ' + interval);
+		request(options, function(err, response, data) {
+			if (err) return;
+			debug('status code ' + response.statusCode);
+			if (response.statusCode === 200) {
+				debugData('data:' + JSON.stringify(data));
+				that.emit('data', data);
+				that.data = data;
+				that.lastModified = response.headers['last-modified'];
+			}
+			if (statusCodeOkAndStillRunning(response)) {
+				setTimeout(run, interval);
+			}
+		});
+
+	};
+	setTimeout(run, interval);
+
 };
 
 ResourceChangedEvents.prototype.stop = function() {
-	if (this.timeout) {
-		clearInterval(this.timeout);
-		this.timeout = undefined;
-	}
+	this.running = false;
 };
-
-
